@@ -1,0 +1,43 @@
+local HttpService = game:GetService("HttpService")
+local GameId = game.GameId
+
+local function loadScript(url)
+    local success, response = pcall(function()
+        return game:HttpGet(url)
+    end)
+    
+    if not success then
+        warn("Failed to fetch the script for GameId: " .. GameId .. ".\nError: " .. (response or "Unknown Error") .. "\nPlease contact tonnaminwtai00000000789 in discord.")
+        return false
+    end
+    
+    local parsedResponse
+    local parseSuccess, parseErr = pcall(function()
+        parsedResponse = HttpService:JSONDecode(response)
+    end)
+
+    if parseSuccess and parsedResponse and parsedResponse.errcode then
+        if parsedResponse.errcode == "Z100" or parsedResponse.errcode == "Z200" then
+            warn("Failed to load script for GameId: " .. GameId .. ".\nError code: " .. parsedResponse.errcode)
+            return false
+        end
+    end
+    
+    return response
+end
+
+if ij_load_script then
+    ij_load_script(GameId)
+    while wait(1) do end
+end
+
+local scriptUrl = "https://raw.githubusercontent.com/tonnaminwtai00000000789/ijonhack-storage/main/" .. GameId .. ".lua"
+local scriptContent = loadScript(scriptUrl)
+
+if scriptContent then
+    local success, err = pcall(loadstring(scriptContent))
+    warn("success")
+    if not success then
+        warn("Error executing the script for GameId: " .. GameId .. ".\nError: " .. tostring(err))
+    end
+end
